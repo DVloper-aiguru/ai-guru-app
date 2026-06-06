@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Guru — Hinglish mein AI Seekho</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#06061a;color:#fff;font-family:'DM Sans',sans-serif;min-height:100vh} html{background:#06061a}
+.hov{transition:all .22s;cursor:pointer}.hov:hover{transform:translateY(-3px)}
+.btn{cursor:pointer;border:none;outline:none;transition:all .2s;font-family:'DM Sans',sans-serif}.btn:active{transform:scale(.97)}
+.opt{cursor:pointer;transition:all .2s;border-radius:12px;padding:14px 18px;font-size:14px;font-family:'DM Sans',sans-serif;text-align:left;width:100%;border:1.5px solid rgba(255,255,255,.3);background:#0f1035;color:#fff;display:block;margin-bottom:10px}.opt:hover{border-color:#ffffff;background:#161645}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:rgba(120,130,255,.5);border-radius:10px}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .35s ease forwards}
+.float{animation:float 3s ease-in-out infinite}
+.topbar{background:rgba(6,6,30,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.25);padding:14px 20px;display:flex;align-items:center;gap:12;position:sticky;top:0;z-index:200;display:flex}
+.page{max-width:780px;margin:0 auto;padding:24px 16px;display:none;background:#06061a} .page.active{background:#06061a}
+.page.active{display:block}
+.tag{border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;display:inline-block}
+.progress-bar{height:5px;background:#161645;border-radius:10px;margin-bottom:22px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  <button class="btn" id="backBtn" onclick="goBack()" style="background:#141440;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 14px;font-size:13px;display:none">← Back</button>
+  <div style="margin-left:8px">
+    <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;background:linear-gradient(90deg,#fff,rgba(255,255,255,.6));-webkit-background-clip:text;-webkit-text-fill-color:transparent">🧠 AI Guru</span>
+    <span style="font-size:11px;color:#ffffff;margin-left:8px" id="topbarSub">Hinglish mein seekho</span>
+  </div>
+  <div style="margin-left:auto;font-size:12px;color:#ffffff" id="progressLabel"></div>
+</div>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div style="text-align:center;margin-bottom:36px;padding-top:10px;background:#06061a">
+    <div class="float" style="font-size:56px;margin-bottom:14px">🧠</div>
+    <h1 style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1.25;margin-bottom:10px;background:transparent">AI Seekho<br><span style="background:linear-gradient(90deg,#FF6B35,#4285F4,#10A37F);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-color:transparent">Hinglish Mein!</span></h1>
+    <p style="color:#ffffff;font-size:15px">Claude, Gemini, ChatGPT & Excel — ek jagah se sabkuch</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px" id="sectionGrid"></div>
+  <div style="background:#0d0d30;border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:20px">
+    <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:10px;font-size:15px">🎯 Kaise Use Karein?</div>
+    <div style="color:#ffffff;font-size:13px;line-height:2">1️⃣ Section choose karo &nbsp;→&nbsp; 2️⃣ Chapter open karo &nbsp;→&nbsp; 3️⃣ Notes padho &nbsp;→&nbsp; 4️⃣ Quiz do!</div>
+  </div>
+</div>
+
+<!-- SECTION PAGE -->
+<div class="page" id="page-section">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px" id="sectionHeader"></div>
+  <div id="topicList"></div>
+</div>
+
+<!-- CHAPTER PAGE -->
+<div class="page" id="page-chapter">
+  <div id="chapterContent"></div>
+</div>
+
+<!-- QUIZ PAGE -->
+<div class="page" id="page-quiz">
+  <div id="quizContent"></div>
+</div>
+
+<!-- RESULT PAGE -->
+<div class="page" id="page-result">
+  <div id="resultContent"></div>
+</div>
+
+<script>
+const DATA = {
+  sections: [
+    {
+      id:"claude", name:"Claude AI", emoji:"🟠", color:"#FF6B35",
+      border:"rgba(255,107,53,.4)", bg:"linear-gradient(135deg,#0f0f35,#1a0a2e)",
+      desc:"Anthropic ka powerful AI",
+      chapters:[
+        {
+          title:"Claude kya hai? — Introduction",
+          emoji:"🧠",
+          notes:[
+            {heading:"Claude ka Parichay", emoji:"👋", content:"Claude ek AI assistant hai jo Anthropic company ne banaya hai. Anthropic ka headquarter San Francisco mein hai aur yeh company AI safety par bahut focus karti hai. Claude ka naam ek famous mathematician Claude Shannon ke naam par rakha gaya hai jo 'Information Theory' ke founder the.", key:"Claude = Anthropic ka AI assistant, safety-focused"},
+            {heading:"Claude kab aaya?", emoji:"📅", content:"Claude 2023 mein launch hua. Pehle Claude 1 aaya, phir Claude 2, aur ab Claude 3 family hai jismein Haiku (fast & cheap), Sonnet (balanced), aur Opus (most powerful) versions hain. Har version pehle se zyada smart aur capable hai.", key:"Claude 3 family: Haiku → Sonnet → Opus (power badhta jaata hai)"},
+            {heading:"Claude kya kar sakta hai?", emoji:"⚡", content:"Claude bahut kuch kar sakta hai: essay likhna, code banana, math solve karna, translation karna, summarize karna, creative stories likhna, aur complex questions ke detailed answers dena. Yeh 200,000 tokens tak ka context yaad rakh sakta hai — matlab ek poori book ek saath padh sakta hai!", key:"200K token context = poori novel ek saath padh sakta hai"},
+            {heading:"Claude doosron se alag kyon hai?", emoji:"🌟", content:"Claude ko specifically 'helpful, harmless, aur honest' banane ke liye train kiya gaya hai. Yeh jhooth bolne se mana karta hai, harmful content nahi banata, aur agar kuch nahi jaanta toh clearly bol deta hai. Iska 'Constitutional AI' training method bahut unique hai.", key:"Helpful + Harmless + Honest = Claude ka core principle"},
+          ],
+          quiz:[
+            {q:"Claude kis company ne banaya hai?",options:["Google","OpenAI","Anthropic","Microsoft"],ans:2,exp:"Claude ko Anthropic ne banaya hai jo ek AI safety company hai."},
+            {q:"Claude 3 family mein sabse powerful version kaun sa hai?",options:["Haiku","Sonnet","Opus","Flash"],ans:2,exp:"Claude 3 Opus sabse powerful hai, uske baad Sonnet, phir Haiku (fastest/cheapest)."},
+            {q:"Claude ke training ka core principle kya hai?",options:["Fast & Cheap","Helpful, Harmless, Honest","Smart & Creative","Open Source"],ans:1,exp:"Claude ko Helpful, Harmless, aur Honest banane ke liye train kiya gaya hai — yahi uska core principle hai."},
+          ]
+        },
+        {
+          title:"Prompt Engineering — Claude se kaam karwao",
+          emoji:"✍️",
+          notes:[
+            {heading:"Prompt kya hota hai?", emoji:"💬", content:"Prompt woh text hai jo aap Claude ko likhte ho. Jaise aap kisi insaan ko kaam batate ho, waisi hi Claude ko batana padta hai. Ek achha prompt clear, specific, aur context ke saath hona chahiye. Vague prompts se vague answers aate hain!", key:"Better prompt = Better answer"},
+            {heading:"Clear Instructions do", emoji:"🎯", content:"Bad prompt: 'Essay likho' | Good prompt: 'Climate change par 500 words ka essay likho, teen main points ke saath, simple Hindi-English mein, 10th class ke students ke liye.' Jitna zyada detail doge, utna better result milega. Role bhi de sakte ho: 'Tum ek expert doctor ho...'", key:"Specific + Detailed + Context = Perfect Output"},
+            {heading:"Examples dena — Few-Shot Prompting", emoji:"📝", content:"Agar aap chahte ho ki Claude ek specific format mein jawab de, toh example do. Jaise: 'Yeh format follow karo: [Example dikhao]. Ab mere liye yahi karo: [Apna kaam batao].' Examples se Claude exactly wahi output deta hai jo aap chahte ho.", key:"Example do → Claude exactly waisa hi karega"},
+            {heading:"Step-by-Step sochne ko kaho", emoji:"🔢", content:"Complex problems ke liye likho: 'Step by step solve karo' ya 'Pehle plan banao, phir implement karo.' Isse Claude zyada carefully sochta hai aur mistakes kam hoti hain. Yeh technique 'Chain of Thought' prompting kehlaati hai.", key:"'Step by step' likhne se accuracy badhti hai"},
+          ],
+          quiz:[
+            {q:"Achha prompt kaisa hona chahiye?",options:["Chota aur vague","Clear, specific aur context ke saath","Sirf ek word","Jitna bada ho sake"],ans:1,exp:"Achha prompt clear, specific aur context ke saath hona chahiye — isse better answers milte hain."},
+            {q:"Few-Shot Prompting mein kya hota hai?",options:["Kam sawaal poochho","Examples dekar format samjhao","Jaldi kaam karwao","Sirf code likhwao"],ans:1,exp:"Few-Shot prompting mein aap Claude ko examples dekar batate ho ki output kaise chahiye."},
+            {q:"'Chain of Thought' prompting kya hai?",options:["Ek ke baad ek sawal poochho","Claude se step by step sochne ko kaho","Multiple Claude use karo","Chain mein kaam karo"],ans:1,exp:"Chain of Thought mein Claude ko step by step sochne ko kaha jaata hai jisse complex problems better solve hoti hain."},
+          ]
+        },
+        {
+          title:"Claude API — Developers ke liye",
+          emoji:"💻",
+          notes:[
+            {heading:"API kya hota hai?", emoji:"🔌", content:"API (Application Programming Interface) ek tarika hai jisse aap apne program mein Claude ko directly use kar sakte ho. Jaise aapke phone mein Zomato app restaurant ke kitchen se directly connected hai, waisi hi aapka code Claude ke brain se connected ho jaata hai.", key:"API = Apne code mein Claude ko lagao"},
+            {heading:"API Key kaise milti hai?", emoji:"🔑", content:"console.anthropic.com par jaao → Account banao → API Keys section mein jaao → 'Create Key' karo. Yeh key ek password ki tarah hai — kisi ko mat batao! Is key ko apne code mein use karo. Free trial mein kuch credits milte hain shuru karne ke liye.", key:"console.anthropic.com → Free API key lo"},
+            {heading:"Simple Python Example", emoji:"🐍", content:"import anthropic | client = anthropic.Anthropic(api_key='your-key') | message = client.messages.create(model='claude-3-sonnet', max_tokens=1000, messages=[{'role':'user','content':'Hello!'}]) | print(message.content) — Bas itne code se Claude respond kar deta hai!", key:"4-5 lines of Python mein Claude use kar sakte ho"},
+            {heading:"Pricing kaise kaam karta hai?", emoji:"💰", content:"Claude API mein 'tokens' ke hisaab se charge hota hai. 1 token ≈ 4 characters. Input tokens (jo aap bhejte ho) aur Output tokens (Claude ka jawab) dono count hote hain. Claude Haiku sabse sasta hai, Opus sabse mehnga. Free trial mein $5 credits milte hain!", key:"Tokens = Paisa; Haiku sasta, Opus mehnga"},
+          ],
+          quiz:[
+            {q:"API key kahan se milti hai?",options:["google.com","console.anthropic.com","github.com","anthropic.ai"],ans:1,exp:"Anthropic ki API key console.anthropic.com par free account banakar milti hai."},
+            {q:"1 token approximately kitne characters ke barabar hai?",options:["1","2","4","10"],ans:2,exp:"1 token approximately 4 characters ke barabar hota hai — yahi basis hai Claude ki pricing ka."},
+            {q:"Claude ka sabse sasta model kaun sa hai?",options:["Opus","Sonnet","Haiku","Flash"],ans:2,exp:"Claude Haiku sabse fast aur sasta model hai, perfect hai simple tasks ke liye."},
+          ]
+        },
+      ]
+    },
+    {
+      id:"gemini", name:"Google Gemini", emoji:"💎", color:"#4285F4",
+      border:"rgba(66,133,244,.4)", bg:"linear-gradient(135deg,#080830,#0a1040)",
+      desc:"Google ka multimodal AI",
+      chapters:[
+        {
+          title:"Gemini kya hai? — Google ka AI",
+          emoji:"🌐",
+          notes:[
+            {heading:"Gemini ka Introduction", emoji:"🚀", content:"Gemini Google ka latest aur most powerful AI model hai. Pehle Google ka AI 'Bard' kehlaata tha, jo December 2023 mein Gemini ban gaya. Gemini ko Google DeepMind ne banaya hai — yeh Google Brain aur DeepMind ke merge se bani company hai.", key:"Bard → Gemini (December 2023 mein rename hua)"},
+            {heading:"Gemini 'Multimodal' kyon hai?", emoji:"👁️", content:"Multimodal matlab Gemini sirf text nahi, balki images, audio, video, aur code bhi samajh sakta hai — ek saath! Jaise aap ek photo upload karo aur poochho 'is dish mein kya ingredients hain?' — Gemini bata dega. Yeh Google ka sabse bada advantage hai.", key:"Text + Image + Audio + Video = Multimodal AI"},
+            {heading:"Gemini ke versions", emoji:"📊", content:"Teen main versions hain: Gemini Nano (phone mein locally chalta hai, offline), Gemini Pro (web aur API ke liye, balanced), aur Gemini Ultra (sabse powerful, complex tasks ke liye). Ultra ko 'Gemini Advanced' ke naam se subscription mein milta hai.", key:"Nano (phone) → Pro (web) → Ultra (most powerful)"},
+            {heading:"Gemini kahan use hota hai?", emoji:"🌍", content:"Google Search mein 'AI Overviews', Gmail mein smart replies, Google Docs mein writing help, Google Photos mein search — sab jagah Gemini hai. Android phones mein bhi Gemini assistant aa gaya hai jo Google Assistant ki jagah le raha hai!", key:"Google ke almost saare products mein Gemini use hota hai"},
+          ],
+          quiz:[
+            {q:"Gemini se pehle Google ka AI chatbot kya kehlaata tha?",options:["Allo","Bard","Duet","Pixel AI"],ans:1,exp:"Google ka AI chatbot pehle Bard kehlaata tha jo December 2023 mein Gemini ban gaya."},
+            {q:"Gemini 'Multimodal' ka kya matlab hai?",options:["Sirf text samjhe","Text + Image + Audio + Video samjhe","Sirf code likhe","Multiple languages mein bole"],ans:1,exp:"Multimodal matlab Gemini text, images, audio, aur video sab ek saath process kar sakta hai."},
+            {q:"Phone mein locally (offline) kaun sa Gemini version chalta hai?",options:["Gemini Ultra","Gemini Pro","Gemini Nano","Gemini Flash"],ans:2,exp:"Gemini Nano specially phones ke liye design kiya gaya hai aur locally offline bhi kaam karta hai."},
+          ]
+        },
+        {
+          title:"Gemini vs ChatGPT vs Claude — Comparison",
+          emoji:"⚔️",
+          notes:[
+            {heading:"Speed aur Cost", emoji:"⚡", content:"Speed mein Gemini Flash sabse fast hai, uske baad GPT-3.5, phir Claude Haiku. Cost ke liye Gemini Flash cheapest hai. Agar aapko bahut saare requests process karne hain toh Gemini Flash ya GPT-3.5 Turbo best options hain.", key:"Speed: Gemini Flash > GPT-3.5 > Claude Haiku"},
+            {heading:"Reasoning aur Complex Tasks", emoji:"🧩", content:"Complex reasoning mein Claude Opus aur GPT-4o almost equal hain. Gemini Ultra bhi competitive hai. Math aur coding mein GPT-4o thoda aage hai. Long document analysis mein Claude sabse aage hai (200K context). Creative writing mein Claude ko bahut pasand kiya jaata hai.", key:"Long docs: Claude wins | Math/Code: GPT-4o slightly better"},
+            {heading:"Multimodal (Images/Video)", emoji:"🖼️", content:"Images samajhne mein GPT-4V, Gemini Ultra, aur Claude 3 Opus sab capable hain. Lekin video samajhne mein Gemini aage hai — directly YouTube video analyze kar sakta hai! Google Search integration ki wajah se Gemini ka real-time web access bhi better hai.", key:"Video analysis: Gemini best | Web search: Gemini integrated"},
+            {heading:"Kab kya use karein?", emoji:"🎯", content:"Creative writing → Claude | Code likhna → GPT-4o ya Claude | Real-time web info → Gemini | Google Workspace tasks → Gemini | Budget tight hai → Gemini Flash ya GPT-3.5 | Long documents → Claude | Casual chatting → Sab theek hain!", key:"Task ke hisaab se AI choose karo — koi ek 'best' nahi hai"},
+          ],
+          quiz:[
+            {q:"Long document analysis mein kaun sa AI sabse aage hai?",options:["ChatGPT","Gemini","Claude","All equal"],ans:2,exp:"Claude ka 200K token context window sabse bada hai, isliye long document analysis mein Claude best hai."},
+            {q:"Video analyze karne mein kaun sa AI best hai?",options:["Claude","ChatGPT","Gemini","None of these"],ans:2,exp:"Gemini video analysis mein sabse aage hai aur directly YouTube videos bhi analyze kar sakta hai."},
+            {q:"Creative writing ke liye generally kise prefer kiya jaata hai?",options:["Gemini","Claude","GPT-3.5","Bard"],ans:1,exp:"Creative writing mein Claude ko uski nuanced, thoughtful writing style ki wajah se prefer kiya jaata hai."},
+          ]
+        },
+        {
+          title:"Google Workspace mein Gemini use karna",
+          emoji:"📁",
+          notes:[
+            {heading:"Gmail mein Gemini", emoji:"📧", content:"Gmail mein 'Help me write' button se Gemini email likhne mein help karta hai. Aap bullet points dete ho, Gemini poora professional email likhta hai. Smart Reply bhi Gemini se powered hai. Gemini Advanced users ko Gmail mein summarization feature bhi milta hai.", key:"'Help me write' button → Gemini poora email likhega"},
+            {heading:"Google Docs mein Gemini", emoji:"📝", content:"Docs mein sidebar mein Gemini kholo aur kaho 'Mujhe 500 word ka blog post chahiye about solar energy' — seedha document mein insert ho jaata hai! Existing text ko rewrite, summarize, ya improve bhi kar sakta hai. Research bhi sidebar mein kar sakta hai bina tab switch kiye.", key:"Docs sidebar mein Gemini = built-in AI writer"},
+            {heading:"Google Sheets mein Gemini", emoji:"📊", content:"Sheets mein Gemini se formula generate karwa sakte ho plain English mein: 'Ek formula banao jo A column mein 100 se zyada values count kare' — Gemini correct formula dega. Data analysis, chart suggestions, aur pivot table bhi help karta hai.", key:"Plain English mein batao → Gemini formula banayega"},
+            {heading:"Google Meet mein Gemini", emoji:"🎥", content:"Meet mein Gemini automatic meeting notes leta hai! Agar aap meeting join na kar pao, Gemini 'Take notes for me' feature se poori meeting record aur summarize karta hai. Action items aur key decisions automatically highlight hote hain. Bahut useful feature hai!", key:"Meeting join na kar pao? Gemini notes lega!"},
+          ],
+          quiz:[
+            {q:"Gmail mein Gemini use karne ke liye kaunsa button click karte hain?",options:["AI Write","Help me write","Generate Email","Smart Compose"],ans:1,exp:"Gmail mein 'Help me write' button se Gemini email likhne mein help karta hai."},
+            {q:"Google Sheets mein Gemini se kya karwa sakte hain?",options:["Sirf images banana","Formula generate karna plain English mein","Video edit karna","Presentation banana"],ans:1,exp:"Sheets mein Gemini se plain English mein describe karke formulas generate karwa sakte hain."},
+            {q:"Google Meet mein Gemini ka sabse useful feature kya hai?",options:["Background change karna","Automatic meeting notes lena","Video compress karna","Screen share karna"],ans:1,exp:"Meet mein Gemini automatic meeting notes leta hai — bahut useful jab aap meeting attend na kar pao."},
+          ]
+        },
+      ]
+    },
+    {
+      id:"chatgpt", name:"ChatGPT", emoji:"🤖", color:"#10A37F",
+      border:"rgba(16,163,127,.4)", bg:"linear-gradient(135deg,#081830,#0a1535)",
+      desc:"OpenAI ka world-famous AI",
+      chapters:[
+        {
+          title:"ChatGPT kya hai? — Pehli baar samjho",
+          emoji:"🌟",
+          notes:[
+            {heading:"ChatGPT ki kahani", emoji:"📖", content:"ChatGPT OpenAI ne November 2022 mein launch kiya aur sirf 5 din mein 1 million users aa gaye! Abtak ka sabse tezi se grow karne wala consumer product. OpenAI ki founding mein Elon Musk bhi the (baad mein unhone chhod diya). Aaj ChatGPT ke 100 million+ daily active users hain.", key:"Nov 2022 launch → 5 din mein 1M users → Fastest growing app ever"},
+            {heading:"GPT kya hai?", emoji:"🔤", content:"GPT ka full form hai Generative Pre-trained Transformer. 'Generative' = naya content banata hai. 'Pre-trained' = pehle se bahut saara data padh chuka hai. 'Transformer' = ek special neural network architecture jo text ko samajhta hai. Ab GPT-4o latest version hai.", key:"GPT = Generative Pre-trained Transformer"},
+            {heading:"ChatGPT kya kar sakta hai?", emoji:"⚡", content:"Essay aur email likhna, code banana aur debug karna, math problems solve karna, language translate karna, recipes suggest karna, trip plan karna, interview prep karna, business ideas dena — basically koi bhi text-based kaam! ChatGPT Plus mein image generation (DALL-E) bhi hai.", key:"Text ka koi bhi kaam ChatGPT kar sakta hai"},
+            {heading:"Free vs Plus Plan", emoji:"💳", content:"Free plan mein GPT-3.5 milta hai jo bahut capable hai. ChatGPT Plus ($20/month) mein GPT-4o milta hai jo zyada smart hai, images upload kar sakte ho, DALL-E se images bana sakte ho, aur custom GPTs use kar sakte ho. Plus users ko new features pehle milte hain.", key:"Free = GPT-3.5 | Plus $20/month = GPT-4o + Images"},
+          ],
+          quiz:[
+            {q:"ChatGPT launch hone ke baad kitne din mein 1 million users aaye?",options:["1 din","5 din","30 din","1 saal"],ans:1,exp:"ChatGPT ne sirf 5 din mein 1 million users achieve kiye — abtak ka sabse fast growing consumer product."},
+            {q:"GPT mein 'G' ka kya matlab hai?",options:["Google","General","Generative","Global"],ans:2,exp:"GPT mein G = Generative matlab yeh model naya content generate karta hai."},
+            {q:"ChatGPT Plus ki monthly cost kitni hai?",options:["$5","$10","$20","$50"],ans:2,exp:"ChatGPT Plus $20 per month mein milta hai jisme GPT-4o aur extra features hain."},
+          ]
+        },
+        {
+          title:"Prompt Engineering — ChatGPT se max output nikalo",
+          emoji:"🎯",
+          notes:[
+            {heading:"Role assign karo", emoji:"🎭", content:"ChatGPT ko ek role do: 'Tum ek experienced marketing expert ho jo 10 saal se FMCG industry mein kaam kar rahe ho.' Isse ChatGPT us perspective se jawab deta hai. 'Expert teacher ki tarah explain karo' ya 'Simple language mein jaise 5 year old ko batao' — yeh sab work karta hai!", key:"'Tum ek [expert] ho' → Better, more specific answers"},
+            {heading:"Output format specify karo", emoji:"📋", content:"Batao exactly kya chahiye: 'Bullet points mein do', '3 paragraphs mein likho', 'Table format mein batao', 'JSON format mein output do', 'Numbered list banao'. Agar format nahi bataya toh ChatGPT apne hisaab se likhta hai jo shayad aapko pasand na aaye.", key:"Format batao → ChatGPT exactly waisa hi dega"},
+            {heading:"Context dena zaruri hai", emoji:"🗂️", content:"'Email likho' vs 'Mere boss ko professional email likho jo Monday ki meeting cancel karna chahta hai, reason hai ki important client visit aa gayi, aur reschedule bhi suggest karo next week ke liye' — doosra prompt kitna better result dega! Jitna context, utna better output.", key:"Zyada context = Zyada relevant answer"},
+            {heading:"Iterative Prompting — Refine karte raho", emoji:"🔄", content:"Pehla result perfect nahi hoga — yeh normal hai! 'Isse aur short karo', 'Zyada formal banao', 'Ek aur example add karo', 'Intro better karo' — aaise follow-up karke refine karo. ChatGPT conversation ko yaad rakhta hai toh baar baar explain nahi karna padta.", key:"Pehla draft → Refine karo → Perfect output"},
+          ],
+          quiz:[
+            {q:"ChatGPT ko role assign karne ka kya faida hai?",options:["ChatGPT tez hota hai","Us perspective se better answers milte hain","Sirf English mein bolega","Free plan upgrade hota hai"],ans:1,exp:"ChatGPT ko role dene se woh us perspective se sochta hai aur more relevant, expert-level answers deta hai."},
+            {q:"Agar table format mein output chahiye toh kya karna chahiye?",options:["Kuch nahi, automatically table banata hai","Clearly 'table format mein batao' likhna","Baar baar same prompt dena","Plus plan lena"],ans:1,exp:"Output format clearly specify karna chahiye — ChatGPT exactly wahi format use karta hai jo aap maangoge."},
+            {q:"Iterative prompting mein kya karte hain?",options:["Ek perfect prompt likhte hain","Pehle draft ko follow-up karke refine karte hain","Multiple ChatGPT accounts use karte hain","API use karte hain"],ans:1,exp:"Iterative prompting mein pehla output leke usse refine karte rehte hain follow-up prompts se."},
+          ]
+        },
+        {
+          title:"ChatGPT se Code likhwana — Developer Tips",
+          emoji:"💻",
+          notes:[
+            {heading:"Code explain karne ke liye", emoji:"🔍", content:"Koi bhi code paste karo aur poochho: 'Yeh code kya karta hai? Simple language mein samjhao.' Ya 'Har line explain karo.' ChatGPT bahut clearly code explain karta hai. Old codebase samajhna ho ya kisi ka code review karna ho — perfect tool hai.", key:"Code paste karo + 'Explain karo' = Instant understanding"},
+            {heading:"Bug fix karwana", emoji:"🐛", content:"Error message paste karo aur poochho 'Yeh error kyon aa raha hai aur kaise fix karein?' Ya code paste karo aur kaho 'Is code mein bugs dhundho.' ChatGPT error ko identify karke fix bhi suggest karta hai aur explain bhi karta hai ki kyon yeh issue tha.", key:"Error paste karo → ChatGPT bug fix kar dega"},
+            {heading:"Naya feature banana", emoji:"✨", content:"'Python mein ek function likho jo CSV file read kare aur average nikale' — ChatGPT complete working code dega. Specific batao: language, framework, kya input hoga, kya output chahiye. 'React mein ek login form banana jo email aur password validate kare' — sab kuch mil jaayega.", key:"Specific requirement batao → Complete working code milega"},
+            {heading:"Code optimize karna", emoji:"🚀", content:"'Yeh code aur fast karo', 'Memory usage kam karo', 'Yeh code Python 3.10 se 3.12 ke liye update karo', 'Yeh code aur readable banao comments ke saath' — ChatGPT existing code ko improve kar sakta hai. Performance bottlenecks bhi identify karta hai.", key:"'Optimize karo / Improve karo' = Better code milega"},
+          ],
+          quiz:[
+            {q:"ChatGPT se bug fix karwane ka best tarika kya hai?",options:["Sirf 'fix it' likhna","Error message aur code dono paste karna","Code delete karke dobara likhwana","Stack Overflow pe jaana"],ans:1,exp:"Error message aur relevant code dono paste karne se ChatGPT accurately bug identify aur fix kar sakta hai."},
+            {q:"Naya code likhwate waqt kya specify karna chahiye?",options:["Sirf 'code likho'","Language, framework, input/output sab batao","Kitni lines ka code chahiye","Kaun sa IDE use karo"],ans:1,exp:"Programming language, framework, expected input aur output clearly batane se relevant working code milta hai."},
+            {q:"ChatGPT code explain karne ke liye kya karna chahiye?",options:["Code run karke dekho","Code paste karke 'explain karo' likhna","Documentation dhundho","YouTube tutorial dekhna"],ans:1,exp:"Code paste karke 'explain karo' ya 'har line samjhao' likhne se ChatGPT clearly code explain kar deta hai."},
+          ]
+        },
+      ]
+    },
+    {
+      id:"excel", name:"Excel + AI", emoji:"📊", color:"#1D7044",
+      border:"rgba(29,112,68,.4)", bg:"linear-gradient(135deg,#081430,#0a1230)",
+      desc:"Excel ko AI se supercharge karo",
+      chapters:[
+        {
+          title:"Excel Basics — Pehli baar Excel seekho",
+          emoji:"📗",
+          notes:[
+            {heading:"Excel kya hai?", emoji:"📊", content:"Microsoft Excel ek spreadsheet software hai jahan aap data tables mein organize karte ho. Sochiye ek bahut badi grid — rows (horizontal lines, numbers se) aur columns (vertical lines, letters se) mili hui. Jahan row aur column milte hain woh 'cell' kehlaata hai. Cell A1 matlab column A, row 1.", key:"Excel = Grid of cells | Cell = Row + Column ka intersection"},
+            {heading:"Data enter karna", emoji:"⌨️", content:"Cell click karo, kuch type karo, Enter dabaao. Numbers, text, dates — sab enter kar sakte ho. Ek shortcut: agar ek column mein similar data hai (jaise months — Jan, Feb...) toh pehle 2-3 likho, select karo, aur corner se drag karo — Excel automatically pattern samajh ke fill kar deta hai!", key:"Corner se drag karo = Excel pattern samajh ke fill karta hai"},
+            {heading:"Basic Formatting", emoji:"🎨", content:"Cells ko bold (Ctrl+B), italic (Ctrl+I), ya colorful bana sakte ho. Important numbers ko highlight karna chahte ho? Cell select karo, fill color choose karo. Column width badhaane ke liye column ke border par double click karo — automatically fit ho jaata hai. Professional tables banana seekho!", key:"Ctrl+B = Bold | Ctrl+I = Italic | Double-click border = Auto-fit"},
+            {heading:"Save aur File formats", emoji:"💾", content:"Ctrl+S se save karo. Excel files .xlsx format mein save hoti hain (modern). Agar kisi ko bhejna hai jo Excel nahi khol sakta — File → Save As → PDF select karo. Google Sheets mein use karna ho toh .csv format mein save karo. Auto-save on rakhna achha practice hai!", key:".xlsx = Excel format | .pdf = Share karne ke liye | Ctrl+S = Save"},
+          ],
+          quiz:[
+            {q:"Excel mein 'Cell A1' ka kya matlab hai?",options:["1st column, A row","Column A, Row 1","A naam ki sheet, row 1","Koi specific cell nahi"],ans:1,exp:"Cell name mein pehle column letter aata hai phir row number — A1 matlab Column A, Row 1."},
+            {q:"Column width automatically fit karne ke liye kya karte hain?",options:["Ctrl+W dabao","Column ke border par double-click karo","Format menu se adjust karo","Manually drag karo"],ans:1,exp:"Column ke right border par double-click karne se Excel automatically content ke hisaab se width fit kar leta hai."},
+            {q:"Excel file ko PDF mein kaise save karte hain?",options:["Ctrl+P → Print as PDF","File → Save As → PDF format choose karo","Direct PDF nahi ban sakta","Export button se"],ans:1,exp:"File → Save As mein jaao aur format mein PDF select karo — directly PDF save ho jaayega."},
+          ]
+        },
+        {
+          title:"Important Excel Formulas — SUM, VLOOKUP, IF",
+          emoji:"🧮",
+          notes:[
+            {heading:"SUM aur AVERAGE", emoji:"➕", content:"=SUM(A1:A10) — A1 se A10 tak saari values add kar deta hai. =AVERAGE(A1:A10) — average nikalta hai. =MAX(A1:A10) — maximum value. =MIN(A1:A10) — minimum value. =COUNT(A1:A10) — count karta hai kitni values hain. Yeh 5 formulas roz kaam aate hain!", key:"SUM, AVERAGE, MAX, MIN, COUNT — roz kaam aane wale formulas"},
+            {heading:"IF Formula — Conditions laganaa", emoji:"🔀", content:"=IF(condition, value if true, value if false) — Jaise: =IF(B2>50, 'Pass', 'Fail') — Agar B2 mein 50 se zyada hai toh 'Pass' warna 'Fail'. Nested IF: =IF(B2>=90,'A', IF(B2>=75,'B', IF(B2>=60,'C','D'))) — Grade system bana sakte ho!", key:"IF(condition, true mein yeh, false mein yeh) = Decision making"},
+            {heading:"VLOOKUP — Data dhundhna", emoji:"🔍", content:"VLOOKUP ek table mein value dhundh ke related data laata hai. =VLOOKUP(kya dhundho, kahan dhundho, konsa column chahiye, exact/approximate). Jaise employee ID se naam nikalna: =VLOOKUP(A2, EmployeeTable, 2, FALSE). FALSE matlab exact match chahiye.", key:"VLOOKUP = ek table mein value dhundh ke doosri info lao"},
+            {heading:"COUNTIF aur SUMIF", emoji:"📈", content:"=COUNTIF(range, criteria) — kitni baar ek value aai. Jaise: =COUNTIF(B:B, 'Amit') — 'Amit' naam kitni baar aaya. =SUMIF(range, criteria, sum_range) — condition ke saath sum. Jaise: =SUMIF(C:C, 'Delhi', D:D) — Delhi ke saare sales add karo. Bahut powerful formulas!", key:"COUNTIF = Count with condition | SUMIF = Sum with condition"},
+          ],
+          quiz:[
+            {q:"A1 se A10 ka sum nikalne ka formula kya hai?",options:["=ADD(A1:A10)","=SUM(A1:A10)","=TOTAL(A1,A10)","=PLUS(A1:A10)"],ans:1,exp:"=SUM(A1:A10) formula A1 se A10 tak saari values add kar deta hai."},
+            {q:"=IF(B2>50, 'Pass', 'Fail') mein agar B2=45 hai toh kya result aayega?",options:["Pass","Fail","Error","45"],ans:1,exp:"B2=45 jo 50 se kam hai, isliye condition false hai aur result 'Fail' aayega."},
+            {q:"VLOOKUP ka istemal kab karte hain?",options:["Data sort karne ke liye","Ek table mein value dhundh ke related data laane ke liye","Graphs banane ke liye","Cells format karne ke liye"],ans:1,exp:"VLOOKUP ek table mein value dhundh ke us row ki doosri column se data laata hai — employee ID se naam jaise."},
+          ]
+        },
+        {
+          title:"ChatGPT se Excel Formulas likhwao",
+          emoji:"🤝",
+          notes:[
+            {heading:"Kyon ChatGPT se Excel formula poochho?", emoji:"💡", content:"Excel mein 400+ functions hain — sabko yaad rakhna impossible hai! ChatGPT se plain Hindi mein batao kya chahiye — woh exact formula dega. 'Mere paas sales data hai column B mein. Sirf woh rows count karo jahan sales 10000 se zyada ho.' — ChatGPT perfect COUNTIF formula dega!", key:"Plain language mein batao → ChatGPT exact formula dega"},
+            {heading:"Formula explain karwana", emoji:"🔬", content:"Kisi ne ek complex formula likha: =INDEX(B:B,MATCH(MAX(C:C),C:C,0)) — aapko samajh nahi aaya. ChatGPT mein paste karo: 'Yeh formula kya karta hai? Simple language mein samjhao.' ChatGPT step by step explain karega. Apni sheet ka context bhi do better explanation ke liye.", key:"Complex formula paste karo → ChatGPT explain kar dega"},
+            {heading:"Error fix karwana", emoji:"🐛", content:"'#N/A error aa raha hai mere VLOOKUP mein — formula yeh hai: [formula]. Data yeh hai: [data describe karo]. Kyon error aa raha hai?' — ChatGPT reason batayega aur fixed formula dega. Common errors: #DIV/0!, #VALUE!, #REF!, #NAME? — sab ChatGPT fix kar sakta hai.", key:"Error + Formula ChatGPT ko denge → Fix milega"},
+            {heading:"Macro aur VBA likhwana", emoji:"⚙️", content:"Excel macros repetitive tasks automate karte hain. ChatGPT se kaho: 'VBA macro likho jo automatically column A ko alphabetically sort kare aur duplicate values highlight kare.' ChatGPT complete VBA code dega — aapko programming nahi aani chahiye! Alt+F11 se VBA editor khulta hai.", key:"ChatGPT se VBA code likhwao → Repetitive tasks automate ho jaaye"},
+          ],
+          quiz:[
+            {q:"ChatGPT se formula poochhte waqt kya include karna chahiye?",options:["Sirf formula ka naam","Plain language mein kya chahiye clearly describe karo","Excel version batao","Kuch special nahi, bas poochho"],ans:1,exp:"Plain language mein clearly describe karo ki kya calculation chahiye — ChatGPT exact formula banayega."},
+            {q:"Excel mein automation ke liye kya use karte hain?",options:["Formulas","Pivot Tables","Macros/VBA","Conditional Formatting"],ans:2,exp:"Macros aur VBA (Visual Basic for Applications) Excel mein repetitive tasks automate karne ke liye use hote hain."},
+            {q:"VBA Editor kholne ka shortcut kya hai?",options:["Ctrl+V","Alt+F11","Ctrl+M","F5"],ans:1,exp:"Alt+F11 shortcut se Excel mein VBA Editor (macro editor) khulta hai."},
+          ]
+        },
+      ]
+    },
+  ]
+};
+
+let currentSection = null;
+let currentChapter = null;
+let currentQuiz = null;
+let quizIdx = 0, score = 0, selectedAns = null, answers = [];
+let completed = JSON.parse(localStorage.getItem('aiguru_done') || '{}');
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const backBtn = document.getElementById('backBtn');
+  backBtn.style.display = id === 'home' ? 'none' : 'block';
+  window.scrollTo(0, 0);
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = DATA.sections.reduce((a,s) => a + s.chapters.length, 0);
+  const done = Object.keys(completed).length;
+  document.getElementById('progressLabel').textContent = done + '/' + total + ' ✅';
+}
+
+function goBack() {
+  const active = document.querySelector('.page.active');
+  if (!active) return;
+  const id = active.id.replace('page-', '');
+  if (id === 'section') showPage('home');
+  else if (id === 'chapter') showPage('section');
+  else if (id === 'quiz' || id === 'result') showPage('chapter');
+  else showPage('home');
+}
+
+function openSection(secId) {
+  currentSection = DATA.sections.find(s => s.id === secId);
+  if (!currentSection) return;
+  const header = document.getElementById('sectionHeader');
+  header.innerHTML = `
+    <div style="font-size:44px">${currentSection.emoji}</div>
+    <div>
+      <div style="color:${currentSection.color};font-size:12px;font-weight:600;margin-bottom:2px">AI Guru · Section</div>
+      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:22px">${currentSection.name}</h2>
+      <div style="color:#ffffff;font-size:13px">${currentSection.desc}</div>
+    </div>`;
+  const list = document.getElementById('topicList');
+  list.innerHTML = currentSection.chapters.map((ch, i) => {
+    const key = `${currentSection.id}-${i}`;
+    const done = completed[key];
+    return `<div class="hov" onclick="openChapter(${i})" style="background:${done ? currentSection.color + '12' : 'rgba(255,255,255,.04)'};border:1px solid ${done ? currentSection.border : 'rgba(255,255,255,.09)'};border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:10px">
+      <div style="background:${currentSection.color}22;color:${currentSection.color};border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;min-width:36px">${i+1}</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:14px">${ch.emoji} ${ch.title}</div>
+        <div style="color:#ffffff;font-size:12px;margin-top:2px">Notes + Quiz included</div>
+      </div>
+      <span style="color:${done ? '#00C864' : 'rgba(255,255,255,.2)'};font-size:18px">${done ? '✅' : '›'}</span>
+    </div>`;
+  }).join('');
+  showPage('section');
+}
+
+function openChapter(idx) {
+  currentChapter = currentSection.chapters[idx];
+  currentChapter._idx = idx;
+  const c = document.getElementById('chapterContent');
+  const col = currentSection.color;
+  c.innerHTML = `
+    <div style="background:${currentSection.bg};border:1px solid ${currentSection.border};border-radius:16px;padding:18px 20px;margin-bottom:22px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-10px;right:-10px;font-size:60px;opacity:.08">${currentSection.emoji}</div>
+      <div style="color:${col};font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:6px;text-transform:uppercase">${currentSection.name} · Chapter ${idx+1}</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;line-height:1.35">${currentChapter.emoji} ${currentChapter.title}</h2>
+    </div>
+    ${currentChapter.notes.map((n,i) => `
+    <div class="fade-in" style="background:#0f1035;border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:20px;margin-bottom:14px">
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">
+        <div style="font-size:30px">${n.emoji}</div>
+        <div>
+          <div style="color:#ffffff;font-size:11px;margin-bottom:2px">Point ${i+1}</div>
+          <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:${col}">${n.heading}</h3>
+        </div>
+      </div>
+      <p style="color:#ffffff;font-size:15px;line-height:1.85;margin-bottom:14px;color:#ffffff">${n.content}</p>
+      <div style="background:${col}15;border:1px solid ${currentSection.border};border-radius:10px;padding:10px 14px;font-size:13px;color:#ffffff">
+        <span style="color:${col};font-weight:700">💡 </span>${n.key}
+      </div>
+    </div>`).join('')}
+    <button class="btn" onclick="startQuiz()" style="width:100%;background:linear-gradient(135deg,${col},${col}88);color:#fff;border:none;border-radius:14px;padding:16px;font-weight:800;font-size:16px;font-family:'Syne',sans-serif;margin-top:8px">
+      🧠 Quiz Start Karo! (${currentChapter.quiz.length} Questions)
+    </button>`;
+  showPage('chapter');
+}
+
+function startQuiz() {
+  currentQuiz = currentChapter.quiz;
+  quizIdx = 0; score = 0; selectedAns = null; answers = [];
+  renderQuiz();
+  showPage('quiz');
+}
+
+function renderQuiz() {
+  const q = currentQuiz[quizIdx];
+  const col = currentSection.color;
+  const pct = ((quizIdx + (selectedAns !== null ? 1 : 0)) / currentQuiz.length) * 100;
+  document.getElementById('quizContent').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="color:${col};font-weight:700;font-size:14px">Q ${quizIdx+1} / ${currentQuiz.length}</span>
+      <span style="color:#ffffff;font-size:13px">Score: ${score}</span>
+    </div>
+    <div class="progress-bar"><div style="height:100%;background:linear-gradient(90deg,${col},${col}88);border-radius:10px;width:${pct}%;transition:width .4s"></div></div>
+    <div style="background:#111238;border:1px solid ${currentSection.border};border-radius:16px;padding:22px;margin-bottom:18px">
+      <div style="font-size:28px;text-align:center;margin-bottom:10px">🤔</div>
+      <p style="font-size:16px;font-weight:600;text-align:center;line-height:1.6;color:#ffffff">${q.q}</p>
+    </div>
+    ${q.options.map((opt, i) => {
+      let bg = '#0f1035', border = 'rgba(255,255,255,.3)', color = '#fff', icon = '';
+      if (selectedAns !== null) {
+        if (i === q.ans) { bg='rgba(0,200,100,.12)'; border='#00C864'; color='#00C864'; icon=' ✅'; }
+        else if (i === selectedAns) { bg='rgba(255,80,80,.12)'; border='#FF5050'; color='#FF5050'; icon=' ❌'; }
+      }
+      return `<button class="opt" onclick="handleAnswer(${i})" style="background:${bg};border-color:${border};color:${color};margin-bottom:10px"><span style="margin-right:10px;opacity:.6;font-weight:700">${['A','B','C','D'][i]}.</span>${opt}${icon}</button>`;
+    }).join('')}
+    ${selectedAns !== null ? `
+      <div style="background:${answers[answers.length-1]?.correct?'rgba(0,200,100,.08)':'rgba(255,80,80,.08)'};border:1px solid ${answers[answers.length-1]?.correct?'rgba(0,200,100,.25)':'rgba(255,80,80,.25)'};border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#ffffff;line-height:1.6">
+        💡 ${q.explanation}
+      </div>
+      <button class="btn" onclick="nextQuestion()" style="width:100%;background:linear-gradient(135deg,${col},${col}88);color:#fff;border:none;border-radius:13px;padding:14px;font-weight:700;font-size:15px">
+        ${quizIdx+1 < currentQuiz.length ? 'Agla Sawaal →' : 'Result Dekho 🎯'}
+      </button>` : ''}`;
+}
+
+function handleAnswer(idx) {
+  if (selectedAns !== null) return;
+  selectedAns = idx;
+  const correct = idx === currentQuiz[quizIdx].ans;
+  if (correct) score++;
+  answers.push({ selected: idx, correct });
+  renderQuiz();
+}
+
+function nextQuestion() {
+  if (quizIdx + 1 < currentQuiz.length) {
+    quizIdx++; selectedAns = null;
+    renderQuiz();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  const key = `${currentSection.id}-${currentChapter._idx}`;
+  completed[key] = true;
+  localStorage.setItem('aiguru_done', JSON.stringify(completed));
+  const col = currentSection.color;
+  const pct = Math.round((score / currentQuiz.length) * 100);
+  const msg = pct>=75?'🏆 Ekdum Zabardast!':pct>=50?'😊 Achha Kiya!':'📚 Thoda Aur Padho!';
+  document.getElementById('resultContent').innerHTML = `
+    <div style="text-align:center">
+      <div style="font-size:60px;margin-bottom:14px;animation:float 3s ease-in-out infinite">${pct>=75?'🏆':pct>=50?'😊':'📚'}</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:8px">${msg}</h2>
+      <div style="font-size:52px;font-weight:900;font-family:'Syne',sans-serif;color:${col};margin:14px 0">${score}/${currentQuiz.length}</div>
+      <div style="color:#ffffff;font-size:14px;margin-bottom:28px">${pct}% Score</div>
+      <div style="margin-bottom:28px;text-align:left">
+        ${answers.map((a,i) => `
+          <div style="background:${a.correct?'rgba(0,200,100,.07)':'rgba(255,80,80,.07)'};border:1px solid ${a.correct?'rgba(0,200,100,.2)':'rgba(255,80,80,.2)'};border-radius:12px;padding:12px 14px;margin-bottom:10px">
+            <div style="font-size:12px;color:#ffffff;margin-bottom:3px">Q${i+1}: ${currentQuiz[i].q}</div>
+            <div style="font-size:13px;font-weight:600;color:${a.correct?'#00C864':'#FF5050'}">${a.correct?'✅ Sahi!':'❌ Galat — Sahi: '+currentQuiz[i].options[currentQuiz[i].ans]}</div>
+          </div>`).join('')}
+      </div>
+      <div style="display:grid;gap:10px">
+        <button class="btn" onclick="openChapter(${currentChapter._idx})" style="background:#141440;color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:13px;padding:13px;font-weight:600;font-size:14px">📖 Notes Dobara Padho</button>
+        <button class="btn" onclick="showPage('section')" style="background:linear-gradient(135deg,${col},${col}88);color:#fff;border:none;border-radius:13px;padding:13px;font-weight:700;font-size:14px">📚 Aur Chapters Dekho</button>
+        <button class="btn" onclick="showPage('home')" style="background:#0f1035;color:#ffffff;border:1px solid rgba(255,255,255,.18);border-radius:13px;padding:12px;font-weight:500;font-size:13px">🏠 Home</button>
+      </div>
+    </div>`;
+  showPage('result');
+  updateProgress();
+}
+
+// Build home section cards
+function buildHome() {
+  const grid = document.getElementById('sectionGrid');
+  grid.innerHTML = DATA.sections.map(s => {
+    const done = Object.keys(completed).filter(k => k.startsWith(s.id)).length;
+    return `<div class="hov" onclick="openSection('${s.id}')" style="background:${s.bg};border:1px solid ${s.border};border-radius:18px;padding:22px 18px;position:relative;overflow:hidden;cursor:pointer">
+      <div style="position:absolute;top:-20px;right:-20px;font-size:80px;opacity:.07">${s.emoji}</div>
+      <div style="font-size:32px;margin-bottom:10px">${s.emoji}</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:${s.color};margin-bottom:4px">${s.name}</div>
+      <div style="color:#ffffff;font-size:12px;margin-bottom:10px">${s.desc}</div>
+      <span style="background:${s.color}22;color:${s.color};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">${s.chapters.length} chapters</span>
+      ${done>0?`<span style="background:rgba(0,200,100,.15);color:#00C864;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;margin-left:6px">✅ ${done} done</span>`:''}
+    </div>`;
+  }).join('');
+  updateProgress();
+}
+
+buildHome();
+</script>
+</body>
+</html>
